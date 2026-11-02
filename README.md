@@ -2,28 +2,52 @@
 
 # av-subtitles
 
-Half the videos in my library have no subtitles at all — especially the
-Japanese ones. I got tired of watching things I only half understand, so I
-wrote this: point it at a video, get a subtitle file back.
+## In plain words
 
-It's a small pipeline, nothing fancy:
+A lot of adult videos come with no subtitles at all — Japanese ones
+especially. The whole video is in a language you don't speak, so you end
+up watching the pictures and guessing what's going on. This tool fixes
+that: it gives those videos subtitles.
+
+What it does, in plain terms: it pulls the sound out of the video,
+listens to what people are saying, and types it out as a subtitle file —
+an `.srt`, the little text file your player shows at the bottom of the
+screen, one line at a time. Put that file next to the video, press play,
+and you can finally follow the dialogue.
+
+It can translate while it's at it. English subtitles can come out of the
+same run. Chinese subtitles are possible too, through an optional
+translator that also runs offline on your own machine — it's an add-on,
+not built in (details under "Translation, honestly" below).
+
+And the part that matters most for this kind of video: **everything runs
+on your own computer.** Your video is never uploaded to any website, no
+online service ever sees it. Whatever is in your library stays in your
+library.
+
+Under the hood, the whole thing is just this one line:
 
 ```
 video ──ffmpeg──▶ 16kHz mono wav ──faster-whisper──▶ .srt
                                               └──optional──▶ translated .srt
 ```
 
+(ffmpeg is the tool that pulls the audio out of the video;
+faster-whisper is the speech-to-text engine that does the listening
+and typing.)
+
 ## What it does
 
-- Extracts the audio track with ffmpeg and transcribes it with
-  [faster-whisper](https://github.com/SYSTRAN/faster-whisper). Language is
-  auto-detected, or pin it with `--lang ja`.
-- Writes a normal SRT next to the video: `movie.ja.srt`.
-- `--translate en` gives you an English SRT too, using Whisper's own
-  translate task.
-- `--translate zh` gives you a Chinese SRT, translated locally with
-  Argos Translate — **if** you installed it (see below). If you didn't,
-  the tool tells you so and stops. It does not pretend.
+- Pulls the audio out of the video and writes down what's said, with
+  [faster-whisper](https://github.com/SYSTRAN/faster-whisper) doing the
+  listening. The language is auto-detected, or pin it with `--lang ja`.
+- Writes a plain subtitle file next to the video: `movie.ja.srt`.
+- `--translate en` also writes an English subtitle — the same speech,
+  translated as it is transcribed.
+- `--translate zh` also writes a Chinese subtitle, translated offline on
+  your own machine with Argos Translate — **if** you installed it (see
+  below). If you didn't, the tool tells you so and stops. It does not
+  pretend.
 
 ## Install
 
